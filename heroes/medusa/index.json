@@ -1,18 +1,23 @@
 {
   "id": "medusa",
-  "name": "Медуза",
-  "stats": {
-    "hp": 16,
-    "move": 3,
-    "rangeType": "ranged",
-    "size": 1
-  },
+  "heroes": [
+    {
+      "id": "medusa",
+      "name": "Медуза",
+      "hp": 16,
+      "move": 3,
+      "rangeType": "ranged",
+      "size": 1,
+      "image": "avatar.webp"
+    }
+  ],
   "assistants": [
     {
       "id": "harpies",
       "name": "Гарпии",
       "count": 3,
       "hp": 1,
+      "move": 3,
       "rangeType": "melee",
       "size": 1,
       "image": "assets/tokens/harpies.webp"

@@ -1,12 +1,16 @@
 {
   "id": "tesla",
-  "name": "Никола Тесла",
-  "stats": {
-    "hp": 14,
-    "move": 2,
-    "rangeType": "ranged",
-    "size": 1
-  },
+  "heroes": [
+    {
+      "id": "tesla",
+      "name": "Никола Тесла",
+      "hp": 14,
+      "move": 2,
+      "rangeType": "ranged",
+      "size": 1,
+      "image": "avatar.webp"
+    }
+  ],
   "assistants": [],
   "extraItems": [
     [
