@@ -313,15 +313,11 @@
         },
         "actions": [
           {
-            "id": "ask_move",
-            "type": "PROMPT",
-            "return": "$answer",
+            "id": "movement_intro",
+            "type": "LOG",
+            "start": true,
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "isEmpty"
-                },
                 {
                   "var": "$harpies",
                   "operator": "isNonEmpty"
@@ -329,40 +325,37 @@
               ]
             },
             "params": {
-              "message": "Будете передвигать гарпию на расстояние до 3 клеток?",
-              "answers": [
-                {
-                  "id": "move",
-                  "text": "Да",
-                  "value": "move"
-                },
-                {
-                  "id": "skip",
-                  "text": "Нет",
-                  "value": "skip"
-                }
-              ]
+              "message": "Вы можете передвинуть гарпий на расстояние до 3 клеток.",
+              "audience": "private"
             },
-            "start": true,
-            "description": "Спросить: передвигать гарпий (до 3 клеток)?"
+            "description": "Подсказка: фаза перемещения гарпий"
           },
           {
-            "id": "finish_skip",
-            "type": "LOG",
-            "end": true,
+            "id": "finish_movement",
+            "type": "PENDING_ACTIONS",
             "conditions": {
               "all": [
                 {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "skip"
+                  "var": "$harpies",
+                  "operator": "isNonEmpty"
                 }
               ]
             },
             "params": {
-              "message": "Передвижение отменено"
+              "actions": [
+                {
+                  "id": "finish",
+                  "text": "Завершить перемещение",
+                  "action": "setVariables",
+                  "payload": {
+                    "vars": [{ "var": "$harpies", "value": [] }],
+                    "clearVars": ["$harpyId", "$moveCell"],
+                    "clearSelection": true
+                  }
+                }
+              ]
             },
-            "description": "Завершить — передвижение отменено"
+            "description": "Досрочно завершить фазу перемещения гарпий"
           },
           {
             "id": "select_harpy",
@@ -371,9 +364,8 @@
             "conditions": {
               "all": [
                 {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
+                  "var": "$harpies",
+                  "operator": "isNonEmpty"
                 },
                 {
                   "var": "$harpyId",
@@ -394,11 +386,6 @@
             "return": "$moveCell",
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
                 {
                   "var": "$harpyId",
                   "operator": "isNonEmpty"
@@ -423,11 +410,6 @@
             "conditions": {
               "all": [
                 {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
-                {
                   "var": "$harpyId",
                   "operator": "isNonEmpty"
                 },
@@ -441,8 +423,7 @@
               "fighterId": "$harpyId",
               "cellId": "$moveCell",
               "maxSteps": 3,
-              "fromCurrent": true,
-              "removeFrom": "harpies"
+              "fromCurrent": true
             },
             "description": "Переместить гарпию на выбранную клетку"
           },
@@ -469,11 +450,6 @@
             "conditions": {
               "all": [
                 {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
-                {
                   "var": "$harpies",
                   "operator": "isNonEmpty"
                 },
@@ -485,13 +461,11 @@
             },
             "params": {
               "steps": [
-                "ask_move",
                 "select_harpy",
                 "select_cell",
                 "apply_move"
               ],
               "clearVars": [
-                "$answer",
                 "$harpyId",
                 "$moveCell"
               ]
@@ -1041,49 +1015,28 @@
         },
         "actions": [
           {
-            "id": "ask_move",
-            "type": "PROMPT",
-            "return": "$answer",
+            "id": "movement_intro",
+            "type": "LOG",
+            "start": true,
             "conditions": {
               "all": [
                 {
                   "var": "$fighters",
                   "operator": "isNonEmpty"
-                },
-                {
-                  "var": "$answer",
-                  "operator": "isEmpty"
                 }
               ]
             },
             "params": {
-              "message": "Будете передвигать бойца на расстояние до 3 клеток?",
-              "answers": [
-                {
-                  "id": "move",
-                  "text": "Да",
-                  "value": "move"
-                },
-                {
-                  "id": "skip",
-                  "text": "Нет",
-                  "value": "skip"
-                }
-              ]
+              "message": "Вы можете передвинуть своих бойцов на расстояние до 3 клеток.",
+              "audience": "private"
             },
-            "start": true,
-            "description": "Спросить: передвинуть следующего своего бойца?"
+            "description": "Подсказка: фаза перемещения своих бойцов"
           },
           {
-            "id": "skip_all_moves",
-            "type": "SET_VARIABLES",
+            "id": "finish_movement",
+            "type": "PENDING_ACTIONS",
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "skip"
-                },
                 {
                   "var": "$fighters",
                   "operator": "isNonEmpty"
@@ -1091,14 +1044,20 @@
               ]
             },
             "params": {
-              "vars": [
+              "actions": [
                 {
-                  "var": "$fighters",
-                  "value": []
+                  "id": "finish",
+                  "text": "Завершить перемещение",
+                  "action": "setVariables",
+                  "payload": {
+                    "vars": [{ "var": "$fighters", "value": [] }],
+                    "clearVars": ["$fighterId", "$moveCell"],
+                    "clearSelection": true
+                  }
                 }
               ]
             },
-            "description": "Отказ от передвижения — пропустить фазу перемещения"
+            "description": "Досрочно завершить фазу перемещения бойцов"
           },
           {
             "id": "select_fighter",
@@ -1106,11 +1065,6 @@
             "return": "$fighterId",
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
                 {
                   "var": "$fighters",
                   "operator": "isNonEmpty"
@@ -1134,11 +1088,6 @@
             "return": "$moveCell",
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
                 {
                   "var": "$fighterId",
                   "operator": "isNonEmpty"
@@ -1164,11 +1113,6 @@
             "conditions": {
               "all": [
                 {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
-                {
                   "var": "$fighterId",
                   "operator": "isNonEmpty"
                 },
@@ -1183,21 +1127,15 @@
               "cellId": "$moveCell",
               "maxSteps": 3,
               "fromCurrent": true,
-              "passThroughEnemies": true,
-              "removeFrom": "fighters"
+              "passThroughEnemies": true
             },
-            "description": "Переместить бойца и убрать из очереди"
+            "description": "Переместить бойца"
           },
           {
             "id": "loop",
             "type": "RELOOP_PIPELINE",
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
                 {
                   "var": "$fighters",
                   "operator": "isNonEmpty"
@@ -1210,13 +1148,11 @@
             },
             "params": {
               "steps": [
-                "ask_move",
                 "select_fighter",
                 "select_cell",
                 "apply_move"
               ],
               "clearVars": [
-                "$answer",
                 "$fighterId",
                 "$moveCell"
               ]
