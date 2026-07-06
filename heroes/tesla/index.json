@@ -159,15 +159,10 @@
             "description": "Нанести 1 урон каждому врагу на соседней с Теслой клетке"
           },
           {
-            "id": "ask_move",
-            "type": "PROMPT",
-            "return": "$answer",
+            "id": "finish_movement",
+            "type": "PENDING_ACTIONS",
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "isEmpty"
-                },
                 {
                   "var": "$candidates",
                   "operator": "isNonEmpty"
@@ -175,39 +170,20 @@
               ]
             },
             "params": {
-              "message": "Переместить соседнего бойца врага на расстояние 1 клетки от Теслы?",
-              "answers": [
+              "actions": [
                 {
-                  "id": "move",
-                  "text": "Да",
-                  "value": "move"
-                },
-                {
-                  "id": "skip",
-                  "text": "Нет",
-                  "value": "skip"
+                  "id": "finish",
+                  "text": "Завершить перемещение",
+                  "action": "setVariables",
+                  "payload": {
+                    "vars": [{ "var": "$candidates", "value": [] }],
+                    "clearVars": ["$targetId", "$moveCell"],
+                    "clearSelection": true
+                  }
                 }
               ]
             },
-            "description": "Спросить: переместить соседнего вражеского бойца?"
-          },
-          {
-            "id": "finish_skip",
-            "type": "LOG",
-            "end": true,
-            "conditions": {
-              "all": [
-                {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "skip"
-                }
-              ]
-            },
-            "params": {
-              "message": "Передвижение отменено"
-            },
-            "description": "Завершить — передвижение отменено"
+            "description": "Досрочно завершить фазу перемещения соседних бойцов"
           },
           {
             "id": "select_target",
@@ -215,11 +191,6 @@
             "return": "$targetId",
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
                 {
                   "var": "$targetId",
                   "operator": "isEmpty"
@@ -244,11 +215,6 @@
             "conditions": {
               "all": [
                 {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
-                {
                   "var": "$targetId",
                   "operator": "isNonEmpty"
                 },
@@ -271,11 +237,6 @@
             "type": "MOVE_FIGHTER",
             "conditions": {
               "all": [
-                {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
                 {
                   "var": "$targetId",
                   "operator": "isNonEmpty"
@@ -318,11 +279,6 @@
             "conditions": {
               "all": [
                 {
-                  "var": "$answer",
-                  "operator": "equal",
-                  "value": "move"
-                },
-                {
                   "var": "$candidates",
                   "operator": "isNonEmpty"
                 },
@@ -334,13 +290,11 @@
             },
             "params": {
               "steps": [
-                "ask_move",
                 "select_target",
                 "select_cell",
                 "apply_move"
               ],
               "clearVars": [
-                "$answer",
                 "$targetId",
                 "$moveCell"
               ]
